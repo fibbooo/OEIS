@@ -96,7 +96,7 @@ def main(n):
     box_list=squareclasses(n)
 
 
-    with open(f'output{n}.csv', 'w') as result_file:
+    with open(f'A334881_{n}.csv', 'w') as result_file:
         wr = csv.writer(result_file, dialect='excel')
         for i in range(1,n+1):
             wr.writerow([i,countSquares(i,box_list)])

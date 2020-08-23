@@ -32,7 +32,13 @@ checked and divide by a smaller amount. In particular, you should be able to onl
 to implement that.
 Unfortunatly, due to the way the code is run, there isn't really a 'partial result',though the code could be
 restuctured to do that
-The code ran for the first 100 entries in 1653 seconds (28 minutes) on a Macbook Pro
+
+The dot product and absolute sum are explicitly written out for speed; i got a 10% increase. I attempted to use 
+numpy; the main speed increase was expected to be the dot product of the new vector with all of the vectors of the 
+same length, but for me it was slower, probably because appending a vector requires rewriting the whole array. 
+However, I'm new to numpy so i might have just been inefficient. 
+
+The code ran for the first 100 entries in 1653 seconds (28 minutes) on a Macbook Pro 
 
  '''
 
@@ -62,7 +68,7 @@ def square_classes(n):
         '''
         return tuple([abs(i[0]) + abs(j[0]), abs(i[1]) + abs(j[1]), abs(i[2]) + abs(j[2])])
 
-    def orthogonal(i, j):
+    def is_orthogonal(i, j):
         '''
 
         :param i: vector of length 3
@@ -87,7 +93,7 @@ def square_classes(n):
         same_length_vectors = vectors_by_size[length(i)]
         if same_length_vectors is not []:
             for j in same_length_vectors:
-                if orthogonal(i, j):
+                if is_orthogonal(i, j):
                     bounding_box_vertex_counts[absolute_sum(i, j)] += 1
 
         same_length_vectors += [i]  # adds the vector to the list

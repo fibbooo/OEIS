@@ -1,13 +1,15 @@
-'''Creates the b file for  OEIS sequence A334881: Counts the number of squares in an nxnxn cube.
+'''Creates the b file for  OEIS sequence A334881: The number of squares in an nxnxn cube.
 
-Here is how this program works: As a large overview, we are going to count each vertex each square. Afterwards we
-divide by 4 to count the number of squares.
+To do this, the code first finds all of the vertices of squares of a certain maximum size which have a vertex at the
+origin (though not neccesarily in the nxnxn cube). Afterwards we use this calculation to calculate the true number of
+vertices in the whole cube, and then divide by 4 to count the number of squares.
 
 In the nitty gritty:
-Think of each square with sides as vectors, so that they make a cycle. Then, each vertex has one vertex going into it,
-and one vector leaving it.
+Think of each square with sides as vectors, so that they make a cycle. Then, each vertex has one vector going into it,
+and one vector leaving it. We will count each pair of vectors exactly once, corresponding to each vertex once in every
+square of a certain class.
 
-We are going to generate each vector with integer entries in [-n,+n] in some order. As they're generated, put it into
+We are going to generate each vector with integer entries in [-n,+n] . As they're generated, put it into
 a list with all other vectors of the same magnitude, and check which of those its orthogonal too (i.e. has a dot
 product of 0). The vectors which are orthogonal and have the same length define some square, so this combination
 counts one vertex in our oriented square. We will record the smallest box (oriented 'parallel' to the grid) that
@@ -15,28 +17,31 @@ this square fits in by taking the sum of the vectors componentwise absolute valu
 square defined by vectors <1,-1,0>,<1,1,0> fits into has sides of length <2,2,0>)
 
 
-Once all of these boxes are generated, count how many of these boxes fit in the cube; from the 2d work, we know it is
+Once all of these boxes are generated, count how many of these boxes fit in the cube; from the 2D work, we know it is
 the product of (n-i) for each dimension, although because of the way we generated them some of them don't fit at
-all, which has to be dealt with. Then, we multiply it by the number of counts in that box; that is how many of the
+all. Then, we multiply it by the number of counts in that box; that is how many of the
 squares that fit inside of that box fit inside the cube. Adding all of these up give us 4 times the answer,
 so we divide by 4 to get the total answer.
 
 This is O(n^5), I think. For each of the  (2n)^3  vectors we compare them to all of the vectors of the same length;
-that is the surface area of a sphere, so O(n^2), for a total cost of O(m^5). This is placed in a box (hash table has
+that is the surface area of a sphere, so O(n^2), for a total cost of O(Sum n^5). This is placed in a box (hash table has
 constant access time). After we have all of the boxes, there are at most n^3 of them, and the
-processing is constant time
+processing is constant time.
 
 The big slow down I know of in this program is that it might be possible to reduce the number of vectors that are
 checked and divide by a smaller amount. In particular, you should be able to only look at nonnegative entries in the
- first component and then verin particular making use of the symmetry thats in a cube. I got too confused
+ first component and then in particular making use of the symmetry thats in a cube. I got too confused
 to implement that.
-Unfortunatly, due to the way the code is run, there isn't really a 'partial result',though the code could be
-restuctured to do that
 
-The dot product and absolute sum are explicitly written out for speed; i got a 10% increase. I attempted to use 
-numpy; the main speed increase was expected to be the dot product of the new vector with all of the vectors of the 
-same length, but for me it was slower, probably because appending a vector requires rewriting the whole array. 
-However, I'm new to numpy so i might have just been inefficient. 
+
+The dot product and absolute sum are explicitly written out for speed; i got a 10% increase. I attempted to use
+numpy; the main speed increase was expected to be the dot product of the new vector with all of the vectors of the
+same length, but for me it was slower, probably because appending a vector requires rewriting the whole array.
+However, I'm new to numpy so i might have just been inefficient.
+
+
+Unfortunately, due to the way the code is run, there isn't really a 'partial result',though the code could be
+restructured to do that
 
 The code ran for the first 100 entries in 1653 seconds (28 minutes) on a Macbook Pro 
 
@@ -66,8 +71,9 @@ def square_classes(n):
         :param j: vector of length 3
         :return: componentwise absolute value sum
         '''
-        return tuple([abs(i[0]) + abs(j[0]), abs(i[1]) + abs(j[1]), abs(i[2]) + abs(j[2])])
-
+        return tuple(sorted([abs(i[0]) + abs(j[0]), abs(i[1]) + abs(j[1]), abs(i[2]) + abs(j[2])]))
+        #return abs(i[0]) + abs(j[0]), abs(i[1]) + abs(j[1]), abs(i[2]) + abs(j[2]) Testing showed that teh sorting
+        #was maybe 10% faster
     def is_orthogonal(i, j):
         '''
 
@@ -132,7 +138,7 @@ def main(n):
 if __name__ == '__main__':
     import time
 
-    n = 100
+    n =60
     start_time = time.time()
     main(n)
     t = (time.time() - start_time)
